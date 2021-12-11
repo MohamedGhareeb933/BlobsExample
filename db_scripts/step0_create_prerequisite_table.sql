@@ -1,0 +1,21 @@
+
+CREATE SCHEMA IF NOT EXISTS `blob_example`;
+
+USE `blob_example`;
+
+CREATE TABLE IF NOT EXISTS `prerequisite` (
+	`id` BIGINT NOT NULL AUTO_INCREMENT, 
+    `name` varchar(255) DEFAULT NULL, 
+    `desc` VARCHAR(255) DEFAULT NULL, 
+    PRIMARY KEY(`id`)
+)ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `file` (
+	`id` BIGINT NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(255) DEFAULT NULL,
+    `data` BLOB DEFAULT NULL, 
+    `type` VARCHAR(255) DEFAULT NULL, 
+    `prerequisite_id` BIGINT DEFAULT NULL, 
+    PRIMARY KEY(`id`),
+	CONSTRAINT `fk_prerequisite_file` FOREIGN KEY (`prerequisite_id`) REFERENCES `prerequisite`(`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET =utf8mb4;
