@@ -31,12 +31,12 @@ public class PrerequisiteRestController {
     private DbFileRestController dbFileRestController;
 
     @GetMapping
-    public ResponseEntity<CollectionModel<Prerequisite>> getAll() {
+    public ResponseEntity<CollectionModel> getAll() {
         return prerequisiteServiceImple.getAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<Prerequisite>> get(@PathVariable Long id) {
+    public ResponseEntity<CollectionModel> get(@PathVariable Long id) {
         return prerequisiteServiceImple.get(id);
     }
 
