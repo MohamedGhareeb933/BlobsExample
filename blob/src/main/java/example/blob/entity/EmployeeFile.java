@@ -3,18 +3,15 @@ package example.blob.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.persistence.*;
 
 
 @Entity
 @Table(name = "employee_file")
-@NoArgsConstructor
-@AllArgsConstructor
 public class EmployeeFile {
 
     @Id
@@ -44,6 +41,9 @@ public class EmployeeFile {
     @Enumerated(EnumType.STRING)
     private FileType fileType;
 
+    @Transient
+    private String uri;
+
     public EmployeeFile(MultipartFile file, String description, String type)  {
 
         try {
@@ -54,12 +54,29 @@ public class EmployeeFile {
             this.data = file.getBytes();
             this.extension = file.getContentType();
             this.fileType = FileType.valueOf(type.toUpperCase());
-            
+
+            this.uri = ServletUriComponentsBuilder.fromCurrentRequestUri()
+                    .path(String.format("/%s", id))
+                    .toUriString();
 
         }catch (Exception exc) {
             throw new RuntimeException("cannot create new instance for File" + exc);
         }
 
+    }
+
+    public EmployeeFile() {
+    }
+
+    public EmployeeFile(Long id, String name, byte[] data, String extension, String description, Employee employee, FileType fileType, String uri) {
+        this.id = id;
+        this.name = name;
+        this.data = data;
+        this.extension = extension;
+        this.description = description;
+        this.employee = employee;
+        this.fileType = fileType;
+        this.uri = uri;
     }
 
     public Long getId() {
@@ -108,5 +125,21 @@ public class EmployeeFile {
 
     public void setEmployee(Employee employee) {
         this.employee = employee;
+    }
+
+    public FileType getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(FileType fileType) {
+        this.fileType = fileType;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 }

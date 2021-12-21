@@ -2,16 +2,13 @@ package example.blob.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity(name = "employee")
-@AllArgsConstructor
-@NoArgsConstructor
+
 public class Employee {
 
     @Id
@@ -32,7 +29,19 @@ public class Employee {
 
    @OneToMany(mappedBy = "employee",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
    @JsonManagedReference
-   private Set<EmployeeFile> resumes = new HashSet<>();
+   private Set<EmployeeFile> files = new HashSet<>();
+
+    public Employee() {
+    }
+
+    public Employee(Long id, String firstName, String lastName, String email, short age, Set<EmployeeFile> files) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.age = age;
+        this.files = files;
+    }
 
     public Long getId() {
         return id;
@@ -74,19 +83,19 @@ public class Employee {
         this.age = age;
     }
 
-    public Set<EmployeeFile> getResumes() {
-        return resumes;
+    public Set<EmployeeFile> getFiles() {
+        return files;
     }
 
-    public void setResumes(Set<EmployeeFile> resumes) {
-        this.resumes = resumes;
+    public void setFiles(Set<EmployeeFile> files) {
+        this.files = files;
     }
 
     public void add(EmployeeFile resume) {
-       if (resumes == null) {
-           resumes = new HashSet<>();
+       if (files == null) {
+           files = new HashSet<>();
        }
-       resumes.add(resume);
+       files.add(resume);
        resume.setEmployee(this);
    }
 

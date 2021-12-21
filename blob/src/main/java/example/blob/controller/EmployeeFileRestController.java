@@ -11,10 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @CrossOrigin
@@ -40,28 +40,29 @@ public class EmployeeFileRestController {
 
     @GetMapping
     public ResponseEntity<List<ResponseFile>> downloadAll() {
-        List<ResponseFile> files = employeeFileService.downloadAll().map(
-                dbFile -> {
-                    String fileDownloadUri = ServletUriComponentsBuilder
-                            .fromCurrentRequestUri()
-                            .path(String.format("/%s",dbFile.getId()))
-                            .toUriString();
 
-                    return new ResponseFile(dbFile.getName(), fileDownloadUri, dbFile.getExtension());
-                }
-        ).collect(Collectors.toList());
+        Stream<EmployeeFile> employeeStream = employeeFileService.downloadAll();
+
+        List<ResponseFile> files = getResponseFiles(employeeStream);
 
         return new ResponseEntity<>(files, HttpStatus.OK);
     }
 
+    public List<ResponseFile> getResponseFiles(Stream<EmployeeFile> employeeStream) {
+        return employeeStream.map(
+                employeeFile -> {
+                    return new ResponseFile(employeeFile);
+                }
+        ).collect(Collectors.toList());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<byte[]> download(@PathVariable Long id) {
+
         EmployeeFile file = employeeFileService.download(id);
 
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", file.getName()))
                 .body(file.getData());
     }
-
-
 
 }
