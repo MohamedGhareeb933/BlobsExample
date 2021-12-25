@@ -49,16 +49,23 @@ public class EmployeeFile {
         try {
 
             this.description = description;
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-            this.name = fileName;
+            this.name = StringUtils.cleanPath(file.getOriginalFilename());
             this.data = file.getBytes();
             this.extension = file.getContentType();
             this.fileType = FileType.valueOf(type.toUpperCase());
 
-            this.uri = ServletUriComponentsBuilder.fromCurrentRequestUri()
-                    .path(String.format("/%s", id))
-                    .toUriString();
+        }catch (Exception exc) {
+            throw new RuntimeException("cannot create new instance for File" + exc);
+        }
 
+    }
+
+    public EmployeeFile(MultipartFile file)  {
+
+        try {
+            this.name = StringUtils.cleanPath(file.getOriginalFilename());
+            this.data = file.getBytes();
+            this.extension = file.getContentType();
         }catch (Exception exc) {
             throw new RuntimeException("cannot create new instance for File" + exc);
         }
@@ -68,7 +75,7 @@ public class EmployeeFile {
     public EmployeeFile() {
     }
 
-    public EmployeeFile(Long id, String name, byte[] data, String extension, String description, Employee employee, FileType fileType, String uri) {
+    public EmployeeFile(Long id, String name, byte[] data, String extension, String description, Employee employee, FileType fileType) {
         this.id = id;
         this.name = name;
         this.data = data;
@@ -76,7 +83,6 @@ public class EmployeeFile {
         this.description = description;
         this.employee = employee;
         this.fileType = fileType;
-        this.uri = uri;
     }
 
     public Long getId() {
@@ -136,10 +142,21 @@ public class EmployeeFile {
     }
 
     public String getUri() {
-        return uri;
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path(String.format("/files/%s" ,this.id))
+                .toUriString();
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void setFile(MultipartFile file) {
+
+        try {
+            this.name = StringUtils.cleanPath(file.getOriginalFilename());
+            this.data = file.getBytes();
+            this.extension = file.getContentType();
+        }catch (Exception exc) {
+            throw new RuntimeException("cannot create new instance for File" + exc);
+        }
+
     }
+
 }

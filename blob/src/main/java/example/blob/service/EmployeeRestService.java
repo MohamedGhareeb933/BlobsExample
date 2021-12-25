@@ -19,12 +19,37 @@ public class EmployeeRestService {
 
 
     public Employee find(Long id) {
-        return employeeRepository.findById(id).get();
+        return employeeRepository.findById(id).orElseThrow( () ->
+                new RuntimeException("cannot find Employee")
+        );
     }
 
 
     public Employee post(Employee employee) {
         return employeeRepository.save(employee);
+    }
+
+    public Employee put(Employee fromPayload, Long id) {
+
+        return employeeRepository.findById(id).map(
+                fromPersist -> {
+                    if (fromPayload.getFirstName() != null)
+                        fromPersist.setFirstName(fromPayload.getFirstName());
+
+                    if (fromPayload.getLastName() != null)
+                        fromPersist.setLastName(fromPayload.getLastName());
+
+                    if (fromPayload.getEmail() !=null)
+                        fromPersist.setEmail(fromPayload.getEmail());
+
+                    if (fromPayload.getAge() != 0)
+                        fromPersist.setAge(fromPayload.getAge());
+
+                    return employeeRepository.save(fromPersist);
+                }
+        ).orElseThrow( () ->
+                new RuntimeException("cannot update Employee")
+        );
     }
 
 }

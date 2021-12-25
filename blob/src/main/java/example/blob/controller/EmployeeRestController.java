@@ -1,19 +1,16 @@
 package example.blob.controller;
 
 
-import example.blob.dto.ResponseFile;
 import example.blob.entity.Employee;
-import example.blob.entity.EmployeeFile;
 import example.blob.service.EmployeeRestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -49,36 +46,22 @@ public class EmployeeRestController {
                 .add(linkTo(methodOn(EmployeeRestController.class).find(id)).withSelfRel())
                 .add(linkTo(methodOn(EmployeeRestController.class).findAll()).withSelfRel());
 
-        /*employee.getFiles().forEach(
-                employeeFile -> {
-                    employeeModel.add(linkTo(methodOn(EmployeeFileRestController.class).download(employeeFile.getId())).withSelfRel());
-                }
-        );*/
-
-        employee.getFiles().forEach(
-                employeeFile -> { new ResponseFile(employeeFile);
-                }
-        );
-
         return ResponseEntity.ok(employeeModel);
     }
 
     @PostMapping
-    public Employee post(@RequestBody Employee employee) {
-        return employeeRestService.post(employee);
+    public ResponseEntity<EntityModel<Employee>> post(@RequestBody Employee employee) {
+
+        EntityModel employeeModel = EntityModel.of(employeeRestService.post(employee));
+
+        return new ResponseEntity<>(employeeModel, HttpStatus.CREATED);
     }
 
-    private Set<EntityModel<EmployeeFile>> employeeFileEntityModel(Set<EmployeeFile> employeeFiles) {
+    @PutMapping("/{id}")
+    public ResponseEntity<EntityModel<Employee>> update(@RequestBody Employee employee, @PathVariable Long id) {
+        EntityModel employeeModel = EntityModel.of(employeeRestService.put(employee, id));
 
-        if (employeeFiles == null)
-            Collections.emptySet();
-
-        return employeeFiles.stream().map(
-                employeeFile -> {
-                    return EntityModel.of(employeeFile)
-                            .add(linkTo(methodOn(EmployeeFileRestController.class).download(employeeFile.getId())).withSelfRel());
-                }
-        ).collect(Collectors.toSet());
+        return new ResponseEntity<>(employeeModel, HttpStatus.ACCEPTED);
     }
 
 }

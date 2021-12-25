@@ -1,20 +1,21 @@
 package example.blob.controller;
 
 
-import example.blob.dto.ResponseFile;
 import example.blob.dto.ResponseMessage;
 import example.blob.entity.EmployeeFile;
 import example.blob.service.EmployeeFileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @CrossOrigin
@@ -26,35 +27,29 @@ public class EmployeeFileRestController {
 
     @PostMapping
     public ResponseEntity<ResponseMessage> upload(
-            @RequestPart String description,
             @RequestPart MultipartFile file,
-            @RequestPart String employeeId,
-            @RequestPart String type)  {
+            @RequestParam("description") String description,
+            @RequestParam("id") String employeeId,
+            @RequestParam("type") String fileType)  {
         try {
-            employeeFileService.upload(description, file, employeeId, type);
-            return new ResponseEntity<>(new ResponseMessage("file uploaded successfully"), HttpStatus.OK);
+            employeeFileService.upload(description, file, employeeId, fileType);
+            return new ResponseEntity<>(new ResponseMessage("file uploaded successfully"), HttpStatus.CREATED);
         }catch (Exception e) {
-            return new ResponseEntity<>(new ResponseMessage("failed to up uploaded file"), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(new ResponseMessage("failed to upload the file"), HttpStatus.FORBIDDEN);
         }
     }
 
+
     @GetMapping
-    public ResponseEntity<List<ResponseFile>> downloadAll() {
+    public ResponseEntity<CollectionModel<EmployeeFile>> downloadAll() {
 
-        Stream<EmployeeFile> employeeStream = employeeFileService.downloadAll();
+        CollectionModel<EmployeeFile> fileCollection =
+                CollectionModel.of(employeeFileService.downloadAll().collect(Collectors.toList()))
+                        .add(linkTo(methodOn(EmployeeFileRestController.class).downloadAll()).withSelfRel());
 
-        List<ResponseFile> files = getResponseFiles(employeeStream);
-
-        return new ResponseEntity<>(files, HttpStatus.OK);
+        return new ResponseEntity<>(fileCollection, HttpStatus.OK);
     }
 
-    public List<ResponseFile> getResponseFiles(Stream<EmployeeFile> employeeStream) {
-        return employeeStream.map(
-                employeeFile -> {
-                    return new ResponseFile(employeeFile);
-                }
-        ).collect(Collectors.toList());
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<byte[]> download(@PathVariable Long id) {
@@ -65,4 +60,14 @@ public class EmployeeFileRestController {
                 .body(file.getData());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseMessage> update(@RequestPart MultipartFile file,@PathVariable Long id ,@RequestParam String description,@RequestParam String type) {
+
+        try {
+            employeeFileService.update(file, id, description, type);
+            return new ResponseEntity<>(new ResponseMessage("File Updated"), HttpStatus.ACCEPTED);
+        } catch (Exception exception) {
+            return new ResponseEntity<>(new ResponseMessage("failed to update the file"), HttpStatus.ACCEPTED);
+        }
+    }
 }
