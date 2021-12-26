@@ -7,6 +7,11 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+
+/**
+ * Entity for Employee that has Employee info like Name Age and Email
+ * Employee can possibly has many files like resume, National ID or Graduate certificate
+ */
 @Entity(name = "employee")
 public class Employee {
 

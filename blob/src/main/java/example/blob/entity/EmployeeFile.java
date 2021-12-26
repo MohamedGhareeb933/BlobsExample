@@ -10,6 +10,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.persistence.*;
 
 
+/**
+ * EmployeeFile Entity
+ * has the main Information of a file like file name , data type and extension
+ * file type is defined by Enum class of type enum String
+ * has setter constructor that accept multipart file and description and sett the properties from these argument
+ * has Transient uri that is not stored in the data-base and return the file download uri
+ *
+ */
 @Entity
 @Table(name = "employee_file")
 public class EmployeeFile {
@@ -54,18 +62,6 @@ public class EmployeeFile {
             this.extension = file.getContentType();
             this.fileType = FileType.valueOf(type.toUpperCase());
 
-        }catch (Exception exc) {
-            throw new RuntimeException("cannot create new instance for File" + exc);
-        }
-
-    }
-
-    public EmployeeFile(MultipartFile file)  {
-
-        try {
-            this.name = StringUtils.cleanPath(file.getOriginalFilename());
-            this.data = file.getBytes();
-            this.extension = file.getContentType();
         }catch (Exception exc) {
             throw new RuntimeException("cannot create new instance for File" + exc);
         }

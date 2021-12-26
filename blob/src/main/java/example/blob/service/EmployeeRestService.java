@@ -7,6 +7,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+
+/**
+ *  Employee service Layer
+ *  that get has Data Access layer Instance to retrieve and save the Data from and into database
+ *
+ */
 @Service
 public class EmployeeRestService {
 

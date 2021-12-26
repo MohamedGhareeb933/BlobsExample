@@ -16,6 +16,14 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+
+/**
+ * Employee Controller Layer
+ *  has four http method find/all
+ *  save/update
+ *
+ *  all methods return responseEntity of EntityModels that has find/all links Attached to it
+ */
 @RestController
 @CrossOrigin
 @RequestMapping("/employees")

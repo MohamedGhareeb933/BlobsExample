@@ -17,6 +17,22 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+
+/**
+ * Employee File Rest Controller Layer
+ *  has four Http Method upload/update download/all
+ *
+ *  upload method get 4 argument from url parameters
+ *  form-data file, Description, id, type Parameters
+ *
+ *  download all is getting a list of the files
+ *
+ *  download file is using Content disposition header to download the file
+ *
+ *  update accept multiple parameter for setters update the persisted data
+ *
+ *
+ */
 @RestController
 @CrossOrigin
 @RequestMapping("/files")

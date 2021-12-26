@@ -8,9 +8,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.stream.Stream;
 
+
+/**
+ * EmployeeFile service Layer
+ * has upload method that save the file in the database
+ * accept for argument and set the file properties based on these arguments
+ *
+ * upload API is also add a file Entity to Employee Entity  by the Id we passed in the url parameter
+ *
+ * download is get the file from db
+ *
+ * upload is set the file from persist to the file from the form data
+ * then set each of file Properties to the parameters passed in the url argument if they exist.
+ *
+ * download all is get all file from db.
+ */
 @Service
 public class EmployeeFileService {
 
@@ -34,27 +48,28 @@ public class EmployeeFileService {
     }
 
     public EmployeeFile download(Long id) {
-        return employeeFileRepository.findById(id).get();
+        return employeeFileRepository.findById(id)
+                .orElseThrow( () -> new RuntimeException("cannot Download the Employee file ") );
     }
 
     public Stream<EmployeeFile> downloadAll() {
         return employeeFileRepository.findAll().stream();
     }
 
-    public EmployeeFile update(MultipartFile file, Long id , String description, String type) {
-        return employeeFileRepository.findById(id).map(
-                fileFromPersist -> {
-                    if (file != null)
-                           fileFromPersist.setFile(file);
+    public EmployeeFile update(MultipartFile formDatafile, Long fileId , String fileDescription, String fileType) {
+        return employeeFileRepository.findById(fileId).map(
+                persistFile -> {
+                    if (formDatafile != null)
+                           persistFile.setFile(formDatafile);
 
-                    if (description != null)
-                        fileFromPersist.setDescription(description);
+                    if (fileDescription != null)
+                        persistFile.setDescription(fileDescription);
 
-                    if (type != null) {
-                        fileFromPersist.setFileType(FileType.valueOf(type.toUpperCase()));
+                    if (fileType != null) {
+                        persistFile.setFileType(FileType.valueOf(fileType.toUpperCase()));
                     }
 
-                    return employeeFileRepository.save(fileFromPersist);
+                    return employeeFileRepository.save(persistFile);
                 }
         ).orElseThrow(
                 () -> new RuntimeException("can not update the file")

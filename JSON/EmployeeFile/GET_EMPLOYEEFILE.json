@@ -1,0 +1,5 @@
+{
+    "_GETALL_EMPLOYEEFILE_URL" : "localhost:8080/files",
+    "_GET_EMPLOYEEFILE_URL" : "localhost:8080/files/1"
+
+}

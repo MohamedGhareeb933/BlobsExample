@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -47,7 +46,9 @@ public class EmployeeTest {
 
     @Test
     void FindAll_Employee_Test() throws Exception {
-        this.mockMvc.perform(get("/employees")).andExpect(status().isOk()).andDo(print())
+        this.mockMvc.perform(get("/employees"))
+                .andExpect(status().isOk())
+                .andDo(print())
                 .andExpectAll(
                         jsonPath("$._embedded.employeeList[*].id").isNotEmpty(),
                         jsonPath("$._embedded.employeeList[0].firstName").isString(),
@@ -58,7 +59,9 @@ public class EmployeeTest {
 
     @Test
     void Find_Employees_Test() throws Exception {
-        this.mockMvc.perform(get("/employees/{id}", 1)).andExpect(status().isOk()).andDo(print())
+        this.mockMvc.perform(get("/employees/{id}", 1))
+                .andExpect(status().isOk())
+                .andDo(print())
                 .andExpectAll(
                         jsonPath("$.id").value(1),
                         jsonPath("$.firstName").value("mohamed"),
@@ -77,7 +80,7 @@ public class EmployeeTest {
         employee.setFiles(new HashSet<EmployeeFile>());
         employee.setEmail("mohamend@gmail.com");
 
-        String Payload = jsonToObject(employee);
+        String Payload = objectToJson(employee);
 
         this.mockMvc.perform(post("/employees").content(Payload))
                 .andDo(print())
@@ -92,13 +95,13 @@ public class EmployeeTest {
         employee.setLastName("ghareeb");
         employee.setEmail("mohamedGhareeb@gmail.com");
 
-        this.mockMvc.perform(put("/employees/{id}", 1).content(jsonToObject(employee)))
+        this.mockMvc.perform(put("/employees/{id}", 1).content(objectToJson(employee)))
                 .andDo(print())
                 .andExpect(status().isAccepted());
     }
 
 
-     static String jsonToObject(Object object)  {
+     static String objectToJson(Object object)  {
         try {
             return new ObjectMapper().writeValueAsString(object);
         }catch (JsonProcessingException exception) {
